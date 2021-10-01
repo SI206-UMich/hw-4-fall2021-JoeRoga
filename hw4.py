@@ -212,31 +212,60 @@ class TestAllMethods(unittest.TestCase):
 		# case 3: check if the cashier can order item from that stall
         customer_wallet = self.f1.wallet
         stall_inventory = self.s3.inventory["Burger"]
-        self.f1.validate_order(self.c1, self.s3, "Burger", 20)
-        self.assertGreater(customer_wallet, self.f1.wallet)
-        self.assertGreater(stall_inventory, self.s3.inventory["Burger"])
+        # new stall that can't be ordered from
+        self.s4 = Stall("The Streatery", self.s3.inventory)
+        self.f1.validate_order(self.c1, self.s4, "Burger", 20)
+        self.assertEqual(customer_wallet, self.f1.wallet)
+        self.assertEqual(stall_inventory, self.s3.inventory["Burger"])
 
     # Test if a customer can add money to their wallet
     def test_reload_money(self):
         customer_preload = self.f1.wallet
         self.f1.reload_money(100)
-        self.assertFalse(customer_preload, self.f1.wallet)
+        self.assertFalse(customer_preload == self.f1.wallet)
     
 ### Write main function
 def main():
     #Create different objects 
-
+    pizza_inventory = {"Pizza":60, "Breadsticks":30, "Calzone":2}
+    ice_cream_inventory = {"Chocolate": 100, "Vanilla": 150, "Strawberry": 80, "Cherry": 70, "Pistachio": 50, "Just Ice": 5}
+    fred = Customer("Fred", 60)
+    jim = Customer("Jimmy", 80)
+    rich = Customer("Chauncy", 500)
+    pizza = Stall("Martino's Pie Co.", pizza_inventory, cost = 12)
+    ice = Stall("Cold Confections", ice_cream_inventory, cost = 6)
+    joe_m = Cashier("Joe Martino", directory = [pizza])
+    v_fries = Cashier("Dr. Victor Fries", directory = [ice])
     #Try all cases in the validate_order function
     #Below you need to have *each customer instance* try the four cases
     #case 1: the cashier does not have the stall 
-    
+    fred.validate_order(v_fries, pizza, "Pizza", 5)
+    jim.validate_order(v_fries, pizza, "Calzone", 5)
+    rich.validate_order(v_fries, pizza, "Breadsticks", 5)
+    fred.validate_order(joe_m, ice, "Chocolate", 5)
+    jim.validate_order(joe_m, ice, "Vanilla", 5)
+    rich.validate_order(joe_m, ice, "Cherry", 5)
     #case 2: the casher has the stall, but not enough ordered food or the ordered food item
-    
+    fred.validate_order(joe_m, pizza, "Calzone", 4) #ordered more food than in inventory
+    jim.validate_order(joe_m, pizza, "Calzone", 5) #item not on menu
+    rich.validate_order(joe_m, pizza, "Breadsticks", 35) #more food
+    fred.validate_order(v_fries, ice, "Just Ice", 6)
+    jim.validate_order(v_fries, ice, "Rocky Road", 5) #ordered items they don't have
+    rich.validate_order(v_fries, ice, "Gelato", 5)
     #case 3: the customer does not have enough money to pay for the order: 
-    
+    fred.validate_order(joe_m, pizza, "Pizza", 10)
+    jim.validate_order(joe_m, pizza, "Breadsticks", 20) 
+    rich.validate_order(joe_m, pizza, "Pizza", 50) 
+    fred.validate_order(v_fries, ice, "Pistachio", 40)
+    jim.validate_order(v_fries, ice, "Strawberry", 60) 
+    rich.validate_order(v_fries, ice, "Vanilla", 125)
     #case 4: the customer successfully places an order
-
-    pass
+    fred.validate_order(joe_m, pizza, "Calzone", 1)
+    jim.validate_order(joe_m, pizza, "Breadsticks", 3) 
+    rich.validate_order(joe_m, pizza, "Pizza", 8) 
+    fred.validate_order(v_fries, ice, "Pistachio", 4)
+    jim.validate_order(v_fries, ice, "Strawberry", 3) 
+    rich.validate_order(v_fries, ice, "Vanilla", 15)
 
 if __name__ == "__main__":
 	main()
