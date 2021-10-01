@@ -213,7 +213,7 @@ class TestAllMethods(unittest.TestCase):
         customer_wallet = self.f1.wallet
         stall_inventory = self.s3.inventory["Burger"]
         # new stall that can't be ordered from
-        self.s4 = Stall("The Streatery", self.s3.inventory)
+        self.s4 = Stall("The Closed by Order of the Health Department", self.s3.inventory)
         self.f1.validate_order(self.c1, self.s4, "Burger", 20)
         self.assertEqual(customer_wallet, self.f1.wallet)
         self.assertEqual(stall_inventory, self.s3.inventory["Burger"])
